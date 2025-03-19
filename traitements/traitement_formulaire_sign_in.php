@@ -1,8 +1,5 @@
 <?php
-    require "language.php" ; 
-    use DBConfig\Database;
-?>
-<?php
+require "language.php";
 
 try {
     // Retrieve form data
@@ -14,14 +11,15 @@ try {
         $_SESSION['test_pwd'] = 5;
     }
 
+    // Database connection
+    $utilisateur = "root";
+    $serveur = "localhost";
+    $motdepasse = "";
+    $basededonnees = "sae-refonte";
 
-
-    // Database connection function
-    function dbConnect(): PDO {
-        return Database::getConnection();
-    }
     // Connect to database
-    $bdd = dbConnect();
+    $bdd = new PDO('mysql:host=' . $serveur . ';dbname=' . $basededonnees, $utilisateur, $motdepasse);
+    $bdd->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // Check if user email exists
     $queryIdUti = $bdd->prepare('SELECT Id_Uti, Pwd_Uti FROM UTILISATEUR WHERE Mail_Uti = :mail');
