@@ -1,6 +1,4 @@
 <?php
-    // Database connection
-    use DBConfig\Database;
 
 // Error handling with try-catch block
 try {
@@ -13,13 +11,14 @@ try {
         $_SESSION['test_pwd'] = 5;
     }
 
+    // Database connection
+    $utilisateur = "inf2pj02";
+    $serveur = "localhost";
+    $motdepasse = "ahV4saerae";
+    $basededonnees = "inf2pj_02";
 
-    // Database connection function
-    function dbConnect(): PDO {
-        return Database::getConnection();
-    }
     // Connect to database
-    $bdd = dbConnect();
+    $bdd = new PDO('mysql:host=' . $serveur . ';dbname=' . $basededonnees, $utilisateur, $motdepasse);
 
     // Check if user email exists
     $queryIdUti = $bdd->prepare('SELECT Id_Uti, Pwd_Uti FROM UTILISATEUR WHERE Mail_Uti = :mail');

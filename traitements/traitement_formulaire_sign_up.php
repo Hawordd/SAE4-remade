@@ -1,7 +1,5 @@
 <?php
 require "language.php";
-// Database connection
-use DBConfig\Database;
 ?>
 <?php
 // Retrieve form data
@@ -14,13 +12,12 @@ $Mail_Uti = $_POST['mail'];
 
 $_SESSION['Mail_Temp'] = $Mail_Uti;
 
-
-
-// Database connection function
-function dbConnect(): PDO {
-    return Database::getConnection();
-}
-$connexion = dbConnect();
+// Database connection
+$utilisateur = "inf2pj02";
+$serveur = "localhost";
+$motdepasse = "ahV4saerae";
+$basededonnees = "inf2pj_02";
+$connexion = new mysqli($serveur, $utilisateur, $motdepasse, $basededonnees);
 
 // Retrieve the maximum Id_Uti value
 $requete = "SELECT MAX(Id_Uti) AS id_max FROM UTILISATEUR";
