@@ -1,9 +1,7 @@
 <?php
 require "language.php";
-?>
-<?php
+session_start();
 
-// Error handling with try-catch block
 try {
     // Retrieve form data
     $pwd = $_POST['pwd'];
@@ -22,6 +20,7 @@ try {
 
     // Connect to database
     $bdd = new PDO('mysql:host=' . $serveur . ';dbname=' . $basededonnees, $utilisateur, $motdepasse);
+    $bdd->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // Check if user email exists
     $queryIdUti = $bdd->prepare('SELECT Id_Uti, Pwd_Uti FROM UTILISATEUR WHERE Mail_Uti = :mail');
@@ -69,3 +68,4 @@ try {
     // Handle any exceptions
     echo "An error occurred: " . $e->getMessage();
 }
+?>

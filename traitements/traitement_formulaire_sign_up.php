@@ -41,8 +41,9 @@ if ($nb == 0) {
     $connexion->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // Prepare the insertion query for the user
+    $hashedPwd = password_hash($pwd, PASSWORD_DEFAULT);
     $insertionUtilisateur = $connexion->prepare("INSERT INTO UTILISATEUR (Id_Uti, Prenom_Uti, Nom_Uti, Adr_Uti, Pwd_Uti, Mail_Uti) VALUES (?, ?, ?, ?, ?, ?)");
-    $insertionUtilisateur->execute([$iduti, $prenom, $nom, $adresse, $pwd, $Mail_Uti]);
+    $insertionUtilisateur->execute([$iduti, $prenom, $nom, $adresse, $hashedPwd, $Mail_Uti]);
 
     echo $htmlEnregistrementUtilisateurReussi;
 
