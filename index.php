@@ -98,28 +98,30 @@ if (isset($_SESSION['tempPopup'])) {
 <html lang="fr">
 
 <head>
-    <title><?php echo $htmlMarque; ?></title>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><?php echo $htmlMarque; ?></title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
     <link rel="stylesheet" type="text/css" href="css/style_general.css">
     <link rel="stylesheet" type="text/css" href="css/popup.css">
 </head>
 
-<body>
-    <div class="container">
-        <!-- Left column with search filters -->
-        <div class="leftColumn">
-            <img class="logo" src="img/logo.png" alt="Logo">
-            <div class="contenuBarre">
-                <center>
-                    <strong>
-                        <p><?php echo $htmlRechercherPar; ?></p>
-                    </strong>
-                </center>
-
-                <form method="get" action="index.php">
-                    <label><?php echo $htmlParProfession; ?></label>
-                    <br>
-                    <select name="categorie" id="categories">
+<body class="d-flex" style="background-color: #EBF4EC;">
+    <!-- Sidebar -->
+    <div class="d-flex flex-column flex-shrink-0 p-3 position-sticky top-0"
+        style="width: 280px; height: 100vh; overflow-y: auto; background-color: #659D31;">
+        <span class="fs-4"><img class="img-fluid mw-100" src="img/logo.png" alt="Logo"></span>
+        <hr>
+        <div class="sidebar-content text-white">
+            <h5 class="text-center mb-3"><?php echo $htmlRechercherPar; ?></h5>
+            <form method="get" action="index.php" class="needs-validation">
+                <!-- Profession -->
+                <div class="mb-3">
+                    <label for="categories" class="form-label"><?php echo $htmlParProfession; ?></label>
+                    <select class="form-select form-select-sm" name="categorie" id="categories">
                         <option value="Tout" <?php if($_GET["categorie"] == "Tout") echo 'selected="selected"'; ?>>
                             <?php echo $htmlTout; ?></option>
                         <option value="Agriculteur"
@@ -144,31 +146,40 @@ if (isset($_SESSION['tempPopup'])) {
                             <?php if($_GET["categorie"] == "Pépiniériste") echo 'selected="selected"'; ?>>
                             <?php echo $htmlPépiniériste; ?></option>
                     </select>
-                    <br><br>
+                </div>
 
-                    <?php echo $htmlParVille; ?>
-                    <br>
-                    <input type="text" name="rechercheVille" pattern="[A-Za-z0-9 ]{0,100}"
-                        value="<?php echo $rechercheVille; ?>" placeholder="<?php echo $htmlVille; ?>">
-                    <br>
+                <!-- Ville -->
+                <div class="mb-3">
+                    <label for="ville" class="form-label"><?php echo $htmlParVille; ?></label>
+                    <input type="text" class="form-control form-control-sm" id="ville" name="rechercheVille"
+                        pattern="[A-Za-z0-9 ]{0,100}" value="<?php echo $rechercheVille; ?>"
+                        placeholder="<?php echo $htmlVille; ?>">
+                </div>
 
-                    <?php if (count($returnQueryAdrUti) > 0): ?>
-                    <br><br>
-                    <?php echo $htmlAutourDeChezMoi . ' (' . $Adr_Uti_En_Cours . ')'; ?>
-                    <br><br>
-                    <input name="rayon" type="range" value="<?php echo $rayon; ?>" min="1" max="100" step="1"
-                        onchange="AfficheRange2(this.value)" onkeyup="AfficheRange2(this.value)">
-                    <span id="monCurseurKm">
-                        <?php echo $htmlRayonDe . ' ' . $rayon; if($rayon >= 100) echo '+'; ?>
-                    </span>
-                    <?php echo $htmlKm; ?>
-                    <br><br>
-                    <?php endif; ?>
-                    <br>
+                <!-- Rayon -->
+                <?php if (count($returnQueryAdrUti) > 0): ?>
+                <div class="mb-3">
+                    <label class="form-label d-flex justify-content-between align-items-center">
+                        <?php echo $htmlAutourDeChezMoi . ' (' . $Adr_Uti_En_Cours . ')'; ?>
+                    </label>
+                    <div class="range">
+                        <input type="range" class="form-range" name="rayon" id="rayonRange"
+                            value="<?php echo $rayon; ?>" min="1" max="100" step="1"
+                            onchange="AfficheRange2(this.value)" onkeyup="AfficheRange2(this.value)">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span id="monCurseurKm" class="small">
+                                <?php echo $htmlRayonDe . ' ' . $rayon; if($rayon >= 100) echo '+'; ?>
+                                <?php echo $htmlKm; ?>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <?php endif; ?>
 
-                    <label><?php echo $htmlTri; ?></label>
-                    <br>
-                    <select name="tri" required>
+                <!-- Tri -->
+                <div class="mb-4">
+                    <label for="tri" class="form-label"><?php echo $htmlTri; ?></label>
+                    <select class="form-select form-select-sm" name="tri" required>
                         <option value="nombreDeProduits"
                             <?php if($tri == "nombreDeProduits") echo 'selected="selected"'; ?>>
                             <?php echo $htmlNombreDeProduits; ?></option>
@@ -185,194 +196,291 @@ if (isset($_SESSION['tempPopup'])) {
                             <?php if($tri == "ordrePrenomAntiAlphabétique") echo 'selected="selected"'; ?>>
                             <?php echo $htmlParPrenomAntiAl; ?></option>
                     </select>
-                    <br><br><br>
-
-                    <center><input type="submit" value="<?php echo $htmlRechercher; ?>"></center>
-                </form>
-            </div>
-        </div>
-
-        <!-- Right column with content -->
-        <div class="rightColumn">
-            <!-- Top navigation banner -->
-            <div class="topBanner">
-                <div class="divNavigation">
-                    <a class="bontonDeNavigation" href="index.php"><?php echo $htmlAccueil; ?></a>
-                    <?php if (isset($_SESSION["Id_Uti"])): ?>
-                    <a class="bontonDeNavigation" href="messagerie.php"><?php echo $htmlMessagerie; ?></a>
-                    <a class="bontonDeNavigation" href="achats.php"><?php echo $htmlAchats; ?></a>
-                    <?php endif; ?>
-
-                    <?php if (isset($_SESSION["isProd"]) && $_SESSION["isProd"] == true): ?>
-                    <a class="bontonDeNavigation" href="produits.php"><?php echo $htmlProduits; ?></a>
-                    <a class="bontonDeNavigation" href="delivery.php"><?php echo $htmlCommandes; ?></a>
-                    <?php endif; ?>
-
-                    <?php if (isset($_SESSION["isAdmin"]) && $_SESSION["isAdmin"] == true): ?>
-                    <a class="bontonDeNavigation" href="panel_admin.php"><?php echo $htmlPanelAdmin; ?></a>
-                    <?php endif; ?>
                 </div>
-
-                <!-- Language selector form -->
-                <form action="language.php" method="post" id="languageForm">
-                    <select name="language" id="languagePicker" onchange="submitForm()">
-                        <option value="fr" <?php if($_SESSION["language"] == "fr") echo 'selected'; ?>>Français</option>
-                        <option value="en" <?php if($_SESSION["language"] == "en") echo 'selected'; ?>>English</option>
-                        <option value="es" <?php if($_SESSION["language"] == "es") echo 'selected'; ?>>Español</option>
-                        <option value="al" <?php if($_SESSION["language"] == "al") echo 'selected'; ?>>Deutsch</option>
-                        <option value="ru" <?php if($_SESSION["language"] == "ru") echo 'selected'; ?>>русский</option>
-                        <option value="ch" <?php if($_SESSION["language"] == "ch") echo 'selected'; ?>>中國人</option>
-                    </select>
-                </form>
-
-                <!-- User login/info form -->
-                <form method="post">
-                    <input type="submit"
-                        value="<?php echo !isset($_SESSION['Mail_Uti']) ? $htmlSeConnecter : $_SESSION['Mail_Uti']; ?>"
-                        class="boutonDeConnection">
-                    <input type="hidden" name="popup"
-                        value="<?php echo isset($_SESSION['Mail_Uti']) ? 'info_perso' : 'sign_in'; ?>">
-                </form>
-            </div>
-
-            <h1><?php echo $htmlProducteursEnMaj; ?></h1>
-
-            <!-- Producer gallery -->
-            <div class="gallery-container">
-                <?php 
-                if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET["categorie"])) {
-                    // Use the connection from dbConnect instead of creating a new one
-                    $mabdd = dbConnect();
-                    
-                    // Build the query based on filters
-                    if ($_GET["categorie"] == "Tout") {
-                        $requete = 'SELECT UTILISATEUR.Id_Uti, PRODUCTEUR.Prof_Prod, PRODUCTEUR.Id_Prod, 
-                                    UTILISATEUR.Prenom_Uti, UTILISATEUR.Nom_Uti, UTILISATEUR.Adr_Uti, COUNT(PRODUIT.Id_Produit) 
-                                  FROM PRODUCTEUR 
-                                  JOIN UTILISATEUR ON PRODUCTEUR.Id_Uti = UTILISATEUR.Id_Uti 
-                                  LEFT JOIN PRODUIT ON PRODUCTEUR.Id_Prod = PRODUIT.Id_Prod
-                                  GROUP BY UTILISATEUR.Id_Uti, PRODUCTEUR.Prof_Prod, PRODUCTEUR.Id_Prod, 
-                                    UTILISATEUR.Prenom_Uti, UTILISATEUR.Nom_Uti, UTILISATEUR.Adr_Uti
-                                  HAVING PRODUCTEUR.Prof_Prod LIKE \'%\'';
-                    } else {
-                        $requete = 'SELECT UTILISATEUR.Id_Uti, PRODUCTEUR.Prof_Prod, PRODUCTEUR.Id_Prod, 
-                                    UTILISATEUR.Prenom_Uti, UTILISATEUR.Nom_Uti, UTILISATEUR.Adr_Uti, COUNT(PRODUIT.Id_Produit) 
-                                  FROM PRODUCTEUR 
-                                  JOIN UTILISATEUR ON PRODUCTEUR.Id_Uti = UTILISATEUR.Id_Uti 
-                                  LEFT JOIN PRODUIT ON PRODUCTEUR.Id_Prod = PRODUIT.Id_Prod
-                                  GROUP BY UTILISATEUR.Id_Uti, PRODUCTEUR.Prof_Prod, PRODUCTEUR.Id_Prod, 
-                                    UTILISATEUR.Prenom_Uti, UTILISATEUR.Nom_Uti, UTILISATEUR.Adr_Uti
-                                  HAVING PRODUCTEUR.Prof_Prod = :categorie';
-                    }
-                    
-                    // Add city filter if present
-                    if ($rechercheVille != "") {
-                        $requete .= ' AND Adr_Uti LIKE :rechercheVille';
-                    }
-                    
-                    // Add sorting
-                    switch ($tri) {
-                        case "ordreNomAlphabétique":
-                            $requete .= ' ORDER BY Nom_Uti ASC';
-                            break;
-                        case "ordreNomAntiAlphabétique":
-                            $requete .= ' ORDER BY Nom_Uti DESC';
-                            break;
-                        case "ordrePrenomAlphabétique":
-                            $requete .= ' ORDER BY Prenom_Uti ASC';
-                            break;
-                        case "ordrePrenomAntiAlphabétique":
-                            $requete .= ' ORDER BY Prenom_Uti DESC';
-                            break;
-                        default:
-                            $requete .= ' ORDER BY COUNT(PRODUIT.Id_Produit) DESC';
-                    }
-                    
-                    // Prepare and execute the query
-                    $stmt = $mabdd->prepare($requete);
-                    
-                    // Bind parameters
-                    if ($_GET["categorie"] != "Tout") {
-                        $stmt->bindParam(':categorie', $_GET["categorie"]);
-                    }
-                    
-                    if ($rechercheVille != "") {
-                        $villePattern = '%, _____ %' . $rechercheVille . '%';
-                        $stmt->bindParam(':rechercheVille', $villePattern);
-                    }
-                    
-                    $stmt->execute();
-                    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                    
-                    // Get user coordinates for distance calculation
-                    $urlUti = 'https://nominatim.openstreetmap.org/search?format=json&q=' . urlencode($Adr_Uti_En_Cours);
-                    $coordonneesUti = latLongGps($urlUti);
-                    $latitudeUti = $coordonneesUti[0];
-                    $longitudeUti = $coordonneesUti[1];
-                    
-                    // Display results
-                    if (count($result) > 0) {
-                        foreach ($result as $row) {
-                            if ($rayon >= 100) {
-                                // Display all results if radius is max
-                                echo '<a href="producteur.php?Id_Prod=' . $row["Id_Prod"] . '" class="square1">';
-                                echo $row["Prof_Prod"] . "<br>";
-                                echo $row["Prenom_Uti"] . " " . mb_strtoupper($row["Nom_Uti"]) . "<br>";
-                                echo $row["Adr_Uti"] . "<br>";
-                                echo '<img src="img_producteur/' . $row["Id_Prod"] . '.png" alt="' . $htmlImageUtilisateur . '" style="width: 100%; height: 85%;">';
-                                echo '</a>';
-                            } else {
-                                // Filter by distance
-                                $urlProd = 'https://nominatim.openstreetmap.org/search?format=json&q=' . urlencode($row["Adr_Uti"]);
-                                $coordonneesProd = latLongGps($urlProd);
-                                $latitudeProd = $coordonneesProd[0];
-                                $longitudeProd = $coordonneesProd[1];
-                                $distance = distance($latitudeUti, $longitudeUti, $latitudeProd, $longitudeProd);
-                                
-                                if ($distance < $rayon) {
-                                    echo '<a href="producteur.php?Id_Prod=' . $row["Id_Prod"] . '" class="square1">';
-                                    echo $row["Prof_Prod"] . "<br>";
-                                    echo $row["Prenom_Uti"] . " " . mb_strtoupper($row["Nom_Uti"]) . "<br>";
-                                    echo $row["Adr_Uti"] . "<br>";
-                                    echo '<img src="img_producteur/' . $row["Id_Prod"] . '.png" alt="' . $htmlImageUtilisateur . '" style="width: 100%; height: 85%;">';
-                                    echo '</a>';
-                                }
-                            }
-                        }
-                    } else {
-                        echo $htmlAucunResultat;
-                    }
-                }
-                ?>
-            </div>
-            <br>
-
-            <!-- Footer links -->
-            <div class="basDePage">
-                <form method="post">
-                    <input type="submit" value="<?php echo $htmlSignalerDys; ?>" class="lienPopup">
-                    <input type="hidden" name="popup" value="contact_admin">
-                </form>
-                <form method="post">
-                    <input type="submit" value="<?php echo $htmlCGU; ?>" class="lienPopup">
-                    <input type="hidden" name="popup" value="cgu">
-                </form>
-            </div>
+                <button type="submit" class="btn btn-light w-100"><?php echo $htmlRechercher; ?></button>
+            </form>
         </div>
     </div>
 
+    <!-- Main Content Area -->
+    <div class="flex-grow-1">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-xl navbar-dark bg-white">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain"
+                    aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation"
+                    style="background-color: #659D31;">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarMain">
+                    <ul class="navbar-nav me-auto mb-2 mb-xl-0 d-flex align-items-center">
+                        <!-- Always visible -->
+                        <li class="nav-item">
+                            <a class="nav-link text-black" href="index.php"><?php echo $htmlAccueil; ?></a>
+                        </li>
+
+                        <?php if (isset($_SESSION["Id_Uti"])): ?>
+                        <li class="vr" style="background-color: #659D31; width: 2px; height: 40px;"></li>
+                        <li class="nav-item">
+                            <a class="nav-link text-black" href="messagerie.php"><?php echo $htmlMessagerie; ?></a>
+                        </li>
+                        <li class="vr" style="background-color: #659D31; width: 2px; height: 40px;"></li>
+                        <li class="nav-item">
+                            <a class="nav-link text-black" href="achats.php"><?php echo $htmlAchats; ?></a>
+                        </li>
+
+                        <?php if (isset($_SESSION["isProd"]) && $_SESSION["isProd"] == true): ?>
+                        <li class="vr" style="background-color: #659D31; width: 2px; height: 40px;"></li>
+                        <li class="nav-item">
+                            <a class="nav-link text-black" href="produits.php"><?php echo $htmlProduits; ?></a>
+                        </li>
+                        <li class="vr" style="background-color: #659D31; width: 2px; height: 40px;"></li>
+                        <li class="nav-item">
+                            <a class="nav-link text-black" href="delivery.php"><?php echo $htmlCommandes; ?></a>
+                        </li>
+                        <?php endif; ?>
+
+                        <?php if (isset($_SESSION["isAdmin"]) && $_SESSION["isAdmin"] == true): ?>
+                        <li class="vr" style="background-color: #659D31; width: 2px; height: 40px;"></li>
+                        <li class="nav-item">
+                            <a class="nav-link text-black" href="panel_admin.php"><?php echo $htmlPanelAdmin; ?></a>
+                        </li>
+                        <?php endif; ?>
+                        <?php endif; ?>
+                    </ul>
+
+                    <ul class="navbar-nav d-flex align-items-center">
+                        <!-- Language selector form -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-black" href="#" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                <?php 
+                                    switch($_SESSION["language"]) {
+                                        case "fr": echo "🇫🇷 Français"; break;
+                                        case "en": echo "🇬🇧 English"; break;
+                                        case "es": echo "🇪🇸 Español"; break;
+                                        case "al": echo "🇩🇪 Deutsch"; break;
+                                        case "ru": echo "🇷🇺 русский"; break;
+                                        case "ch": echo "🇨🇳 中國人"; break;
+                                        default: echo "🇫🇷 Français";
+                                    }
+                                ?>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <form action="language.php" method="post" id="languageForm">
+                                        <input type="hidden" id="languageValue" name="language" value="fr">
+                                        <button type="submit" class="dropdown-item" onclick="setLanguage('fr')">🇫🇷
+                                            Français</button>
+                                        <button type="submit" class="dropdown-item" onclick="setLanguage('en')">🇬🇧
+                                            English</button>
+                                        <button type="submit" class="dropdown-item" onclick="setLanguage('es')">🇪🇸
+                                            Español</button>
+                                        <button type="submit" class="dropdown-item" onclick="setLanguage('al')">🇩🇪
+                                            Deutsch</button>
+                                        <button type="submit" class="dropdown-item" onclick="setLanguage('ru')">🇷🇺
+                                            русский</button>
+                                        <button type="submit" class="dropdown-item" onclick="setLanguage('ch')">🇨🇳
+                                            中國人</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <?php if (isset($_SESSION['Mail_Uti'])): ?>
+                        <li class="vr" style="background-color: #659D31; width: 2px; height: 40px;"></li>
+                        <li class="nav-item">
+                            <form method="post">
+                                <input type="hidden" name="popup" value="info_perso">
+                                <button type="submit" class="nav-link text-black border-0 bg-transparent">
+                                    <?php echo $_SESSION['Mail_Uti']; ?>
+                                </button>
+                            </form>
+                        </li>
+                        <?php else: ?>
+                        <li class="vr" style="background-color: #659D31; width: 2px; height: 40px;"></li>
+                        <li class="nav-item">
+                            <form method="post">
+                                <input type="hidden" name="popup" value="sign_in">
+                                <button type="submit" class="btn btn-success">
+                                    <?php echo $htmlSeConnecter; ?>
+                                </button>
+                            </form>
+                        </li>
+                        <?php endif; ?>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <main class="p-3">
+            <div class="container">
+                <h1 class="my-3 text-center"><?php echo $htmlProducteursEnMaj; ?></h1>
+
+
+                <!-- Producer gallery using Bootstrap cards -->
+                <div class="row">
+                    <?php 
+                    if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET["categorie"])) {
+                        // Use the connection from dbConnect
+                        $mabdd = dbConnect();
+                        
+                        // Build the query based on filters
+                        if ($_GET["categorie"] == "Tout") {
+                            $requete = 'SELECT UTILISATEUR.Id_Uti, PRODUCTEUR.Prof_Prod, PRODUCTEUR.Id_Prod, 
+                                        UTILISATEUR.Prenom_Uti, UTILISATEUR.Nom_Uti, UTILISATEUR.Adr_Uti, COUNT(PRODUIT.Id_Produit) 
+                                    FROM PRODUCTEUR 
+                                    JOIN UTILISATEUR ON PRODUCTEUR.Id_Uti = UTILISATEUR.Id_Uti 
+                                    LEFT JOIN PRODUIT ON PRODUCTEUR.Id_Prod = PRODUIT.Id_Prod
+                                    GROUP BY UTILISATEUR.Id_Uti, PRODUCTEUR.Prof_Prod, PRODUCTEUR.Id_Prod, 
+                                        UTILISATEUR.Prenom_Uti, UTILISATEUR.Nom_Uti, UTILISATEUR.Adr_Uti
+                                    HAVING PRODUCTEUR.Prof_Prod LIKE \'%\'';
+                        } else {
+                            $requete = 'SELECT UTILISATEUR.Id_Uti, PRODUCTEUR.Prof_Prod, PRODUCTEUR.Id_Prod, 
+                                        UTILISATEUR.Prenom_Uti, UTILISATEUR.Nom_Uti, UTILISATEUR.Adr_Uti, COUNT(PRODUIT.Id_Produit) 
+                                    FROM PRODUCTEUR 
+                                    JOIN UTILISATEUR ON PRODUCTEUR.Id_Uti = UTILISATEUR.Id_Uti 
+                                    LEFT JOIN PRODUIT ON PRODUCTEUR.Id_Prod = PRODUIT.Id_Prod
+                                    GROUP BY UTILISATEUR.Id_Uti, PRODUCTEUR.Prof_Prod, PRODUCTEUR.Id_Prod, 
+                                        UTILISATEUR.Prenom_Uti, UTILISATEUR.Nom_Uti, UTILISATEUR.Adr_Uti
+                                    HAVING PRODUCTEUR.Prof_Prod = :categorie';
+                        }
+                        
+                        // Add city filter if present
+                        if ($rechercheVille != "") {
+                            $requete .= ' AND Adr_Uti LIKE :rechercheVille';
+                        }
+                        
+                        // Add sorting
+                        switch ($tri) {
+                            case "ordreNomAlphabétique":
+                                $requete .= ' ORDER BY Nom_Uti ASC';
+                                break;
+                            case "ordreNomAntiAlphabétique":
+                                $requete .= ' ORDER BY Nom_Uti DESC';
+                                break;
+                            case "ordrePrenomAlphabétique":
+                                $requete .= ' ORDER BY Prenom_Uti ASC';
+                                break;
+                            case "ordrePrenomAntiAlphabétique":
+                                $requete .= ' ORDER BY Prenom_Uti DESC';
+                                break;
+                            default:
+                                $requete .= ' ORDER BY COUNT(PRODUIT.Id_Produit) DESC';
+                        }
+                        
+                        // Prepare and execute the query
+                        $stmt = $mabdd->prepare($requete);
+                        
+                        // Bind parameters
+                        if ($_GET["categorie"] != "Tout") {
+                            $stmt->bindParam(':categorie', $_GET["categorie"]);
+                        }
+                        
+                        if ($rechercheVille != "") {
+                            $villePattern = '%, _____ %' . $rechercheVille . '%';
+                            $stmt->bindParam(':rechercheVille', $villePattern);
+                        }
+                        
+                        $stmt->execute();
+                        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                        
+                        // Get user coordinates for distance calculation
+                        $urlUti = 'https://nominatim.openstreetmap.org/search?format=json&q=' . urlencode($Adr_Uti_En_Cours);
+                        $coordonneesUti = latLongGps($urlUti);
+                        $latitudeUti = $coordonneesUti[0];
+                        $longitudeUti = $coordonneesUti[1];
+                    
+                        if (count($result) > 0) {
+                            foreach ($result as $row) {
+                                if ($rayon >= 100) {
+                                    // Display all results if radius is max
+                                    echo '<div class="col-md-4 mb-4">';
+                                    echo '<a href="producteur.php?Id_Prod=' . $row["Id_Prod"] . '" class="text-decoration-none">';
+                                    echo '<div class="card shadow-sm h-100">';
+                                    echo '<div class="card-header bg-success text-white text-center">';
+                                    echo '<h5 class="mb-0">' . $row["Prenom_Uti"] . ' ' . mb_strtoupper($row["Nom_Uti"]) . '</h5>';
+                                    echo '</div>';
+                                    echo '<img src="img_producteur/' . $row["Id_Prod"] . '.png" class="card-img-top producer-image" alt="' . $htmlImageUtilisateur . '" style="height: 200px; object-fit: cover;">';
+                                    echo '<div class="card-body text-center">';
+                                    echo '<h6 class="card-title">' . $row["Prof_Prod"] . '</h6>';
+                                    echo '<p class="card-text">' . $row["Adr_Uti"] . '</p>';
+                                    echo '</div>';
+                                    echo '</div>';
+                                    echo '</a>';
+                                    echo '</div>';
+                                } else {
+                                    // Filter by distance
+                                    $urlProd = 'https://nominatim.openstreetmap.org/search?format=json&q=' . urlencode($row["Adr_Uti"]);
+                                    $coordonneesProd = latLongGps($urlProd);
+                                    $latitudeProd = $coordonneesProd[0];
+                                    $longitudeProd = $coordonneesProd[1];
+                                    $distance = distance($latitudeUti, $longitudeUti, $latitudeProd, $longitudeProd);
+                                    
+                                    if ($distance < $rayon) {
+                                        echo '<div class="col-md-4 mb-4">';
+                                        echo '<a href="producteur.php?Id_Prod=' . $row["Id_Prod"] . '" class="text-decoration-none">';
+                                        echo '<div class="card shadow-sm h-100">';
+                                        echo '<div class="card-header bg-success text-white text-center">';
+                                        echo '<h5 class="mb-0">' . $row["Prenom_Uti"] . ' ' . mb_strtoupper($row["Nom_Uti"]) . '</h5>';
+                                        echo '</div>';
+                                        echo '<img src="img_producteur/' . $row["Id_Prod"] . '.png" class="card-img-top producer-image" alt="' . $htmlImageUtilisateur . '" style="height: 200px; object-fit: cover;">';
+                                        echo '<div class="card-body text-center">';
+                                        echo '<h6 class="card-title">' . $row["Prof_Prod"] . '</h6>';
+                                        echo '<p class="card-text">' . $row["Adr_Uti"] . '</p>';
+                                        echo '</div>';
+                                        echo '</div>';
+                                        echo '</a>';
+                                        echo '</div>';
+                                    }
+                                }
+                            }
+                        } else {
+                            echo '<div class="col-12 text-center"><p>' . $htmlAucunResultat . '</p></div>';
+                        }
+                    }
+                    ?>
+                </div>
+            </div>
+
+            <!-- Footer links -->
+            <footer class="container-fluid mt-5 py-3 bg-light">
+                <div class="row justify-content-center">
+                    <div class="col-auto mx-3">
+                        <form method="post">
+                            <input type="hidden" name="popup" value="contact_admin">
+                            <button type="submit"
+                                class="btn btn-outline-secondary btn-sm"><?php echo $htmlSignalerDys; ?></button>
+                        </form>
+                    </div>
+                    <div class="col-auto mx-3">
+                        <form method="post">
+                            <input type="hidden" name="popup" value="cgu">
+                            <button type="submit"
+                                class="btn btn-outline-secondary btn-sm"><?php echo $htmlCGU; ?></button>
+                        </form>
+                    </div>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <!-- Scripts -->
     <script>
-    function submitForm() {
-        document.getElementById("languageForm").submit();
+    function setLanguage(lang) {
+        document.getElementById('languageValue').value = lang;
     }
 
     function AfficheRange2(newVal) {
         var monCurseurKm = document.getElementById("monCurseurKm");
         if (newVal >= 100) {
-            monCurseurKm.innerHTML = "<?php echo $htmlRayonDe; ?> " + newVal + "+ ";
+            monCurseurKm.innerHTML = "<?php echo $htmlRayonDe; ?> " + newVal + "+ <?php echo $htmlKm; ?>";
         } else {
-            monCurseurKm.innerHTML = "<?php echo $htmlRayonDe; ?> " + newVal + " ";
+            monCurseurKm.innerHTML = "<?php echo $htmlRayonDe; ?> " + newVal + " <?php echo $htmlKm; ?>";
         }
     }
     </script>
