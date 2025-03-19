@@ -181,4 +181,12 @@ $htmlConditionsRueDetails="La rue doit faire entre 0 et 120 caractères alphanum
 $htmlCodeIncorrect="code incorrect";
 $htmlChoisirLangue="Choisir une langue";
 $htmlValider="Valider";
+$htmlMessageAdmin = "Message aux producteurs";
+$htmlMessageInfoProds = "Cette page vous permet d'envoyer un message à tous les producteurs de la plateforme.";
+$htmlRetour = "Retour";
+$htmlDiffusionProducteurs = "Diffusion d'un message aux producteurs";
+$htmlEnvoiMessageProducteurs = "Envoi d'un message à tous les producteurs";
+$htmlMaxCaracteres = "Maximum 5000 caractères.";
+$htmlMessageEnvoyeA = "Votre message sera envoyé à";
+$htmlProducteurs = "producteurs";
 ?>
