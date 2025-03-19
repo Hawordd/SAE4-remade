@@ -1,13 +1,8 @@
 <?php
-<<<<<<< HEAD
     require "language.php" ; 
     use DBConfig\Database;
 ?>
 <?php
-=======
-require "language.php";
-session_start();
->>>>>>> e95100b65685eabe79ab39f495f52fd92c23ff0e
 
 try {
     // Retrieve form data
@@ -26,12 +21,7 @@ try {
         return Database::getConnection();
     }
     // Connect to database
-<<<<<<< HEAD
     $bdd = dbConnect();
-=======
-    $bdd = new PDO('mysql:host=' . $serveur . ';dbname=' . $basededonnees, $utilisateur, $motdepasse);
-    $bdd->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
->>>>>>> e95100b65685eabe79ab39f495f52fd92c23ff0e
 
     // Check if user email exists
     $queryIdUti = $bdd->prepare('SELECT Id_Uti, Pwd_Uti FROM UTILISATEUR WHERE Mail_Uti = :mail');
