@@ -1,10 +1,14 @@
 <?php
+<<<<<<< HEAD
     require "language.php" ; 
     use DBConfig\Database;
 ?>
 <?php
+=======
+require "language.php";
+session_start();
+>>>>>>> e95100b65685eabe79ab39f495f52fd92c23ff0e
 
-// Error handling with try-catch block
 try {
     // Retrieve form data
     $pwd = $_POST['pwd'];
@@ -22,64 +26,57 @@ try {
         return Database::getConnection();
     }
     // Connect to database
+<<<<<<< HEAD
     $bdd = dbConnect();
+=======
+    $bdd = new PDO('mysql:host=' . $serveur . ';dbname=' . $basededonnees, $utilisateur, $motdepasse);
+    $bdd->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+>>>>>>> e95100b65685eabe79ab39f495f52fd92c23ff0e
 
     // Check if user email exists
-    $queryIdUti = $bdd->query('SELECT Id_Uti FROM UTILISATEUR WHERE UTILISATEUR.Mail_Uti=\'' . $Mail_Uti . '\'');
-    $returnQueryIdUti = $queryIdUti->fetchAll(PDO::FETCH_ASSOC);
-    
+    $queryIdUti = $bdd->prepare('SELECT Id_Uti, Pwd_Uti FROM UTILISATEUR WHERE Mail_Uti = :mail');
+    $queryIdUti->execute(['mail' => $Mail_Uti]);
+    $returnQueryIdUti = $queryIdUti->fetch(PDO::FETCH_ASSOC);
+
     // Handle invalid email
-    if ($returnQueryIdUti == NULL) {
+    if ($returnQueryIdUti == false) {
         unset($Id_Uti);
         $_SESSION['erreur'] = $htmlAdresseMailInvalide;
     } else {
+        // Extract user ID and hashed password
+        $Id_Uti = $returnQueryIdUti["Id_Uti"];
+        $hashedPassword = $returnQueryIdUti["Pwd_Uti"];
 
-    // Extract user ID
-    $Id_Uti = $returnQueryIdUti[0]["Id_Uti"];
-    
-    // Verify password using stored procedure
-    //echo('CALL verifMotDePasse(' . $Id_Uti . ', \'' . $pwd . '\');');
-    $query = $bdd->query('CALL verifMotDePasse(' . $Id_Uti . ', \'' . $pwd . '\')');
-    
-    
-
-    $test = $query->fetchAll(PDO::FETCH_ASSOC);
-    // Handle password verification
-    if (isset($_SESSION['test_pwd']) && $_SESSION['test_pwd'] > -10) {
-        if ((isset($test[0][1]) and $test[0][1] == 1) or (isset($test[0][0]) and $test[0][0] == 1)) {
+        // Verify password
+        if (password_verify($pwd, $hashedPassword)) {
             echo $htmlMdpCorrespondRedirectionAccueil;
             $_SESSION['Mail_Uti'] = $Mail_Uti;
             $_SESSION['Id_Uti'] = $Id_Uti;
 
-            $bdd2 = new PDO('mysql:host=' . $serveur . ';dbname=' . $basededonnees, $utilisateur, $motdepasse);
-            $isProducteur = $bdd2->query('CALL isProducteur('.$Id_Uti.');');
-            $returnIsProducteur = $isProducteur->fetchAll(PDO::FETCH_ASSOC);
-            $reponse=$returnIsProducteur[0]["result"];
-            if ($reponse!=NULL){
-                $_SESSION["isProd"]=true;
-            }else {
-                $_SESSION["isProd"]=false;
-            }
-            $_SESSION['erreur'] = '';
-            $bdd3 = new PDO('mysql:host=' . $serveur . ';dbname=' . $basededonnees, $utilisateur, $motdepasse);
-            $isAdmin = $bdd3->query('SELECT Id_Uti FROM ADMINISTRATEUR WHERE Id_Uti='.$_SESSION["Id_Uti"]);
-            $returnIsAdmin = $isAdmin->fetchAll(PDO::FETCH_ASSOC);
-            
-            if (count($returnIsAdmin)>0){
-                $_SESSION["isAdmin"]=true;
-            }else {
-                $_SESSION["isAdmin"]=false;
-            }
+            // Check if user is a producer
+            $queryIsProd = $bdd->prepare('SELECT COUNT(*) as count FROM PRODUCTEUR WHERE Id_Uti = :id');
+            $queryIsProd->execute(['id' => $Id_Uti]);
+            $returnIsProd = $queryIsProd->fetch(PDO::FETCH_ASSOC);
+            $_SESSION["isProd"] = $returnIsProd['count'] > 0;
+
+            // Check if user is an admin
+            $queryIsAdmin = $bdd->prepare('SELECT COUNT(*) as count FROM ADMINISTRATEUR WHERE Id_Uti = :id');
+            $queryIsAdmin->execute(['id' => $Id_Uti]);
+            $returnIsAdmin = $queryIsAdmin->fetch(PDO::FETCH_ASSOC);
+            $_SESSION["isAdmin"] = $returnIsAdmin['count'] > 0;
+
             $_SESSION['erreur'] = '';
         } else {
             $_SESSION['test_pwd']--;
             $_SESSION['erreur'] = $htmlMauvaisMdp . $_SESSION['test_pwd'] . $htmlTentatives;
         }
-    }else {
-        $_SESSION['erreur'] = $htmlErreurMaxReponsesAtteintes;
     }
+
+    if ($_SESSION['test_pwd'] <= -10) {
+        $_SESSION['erreur'] = $htmlErreurMaxReponsesAtteintes;
     }
 } catch (Exception $e) {
     // Handle any exceptions
     echo "An error occurred: " . $e->getMessage();
 }
+?>
