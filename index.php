@@ -4,15 +4,27 @@ if (!isset($_SESSION)) {
     session_start();
 }
 
+spl_autoload_register(function ($class) {
+    // Convert namespace separator to directory separator
+    $path = str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
+
+    if (file_exists($path)) {
+        require_once $path;
+        return true;
+    }
+    return false;
+});
+
 // Include language file
 require "language.php";
 
+//Use database classes namespace
+use DBConfig\Database;
+
 // Database connection function
-function dbConnect() {
-    require_once __DIR__ . '/DBConfig/Database.php';
-    require_once __DIR__ . '/DBConfig/Config.php';
-    
-    return \DBConfig\Database::getConnection();
+function dbConnect(): PDO
+{
+    return Database::getConnection();
 }
 
 // Process GET parameters
