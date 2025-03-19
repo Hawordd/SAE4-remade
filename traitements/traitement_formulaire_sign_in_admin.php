@@ -11,14 +11,9 @@ try {
         $_SESSION['test_pwd'] = 5;
     }
 
-    // Database connection
-    $utilisateur = "inf2pj02";
-    $serveur = "localhost";
-    $motdepasse = "ahV4saerae";
-    $basededonnees = "inf2pj_02";
 
-    // Connect to database
-    $bdd = new PDO('mysql:host=' . $serveur . ';dbname=' . $basededonnees, $utilisateur, $motdepasse);
+    /// Use Database class instead of hardcoding credentials
+    $bdd = \DBConfig\Database::getConnection();
 
     // Check if user email exists
     $queryIdUti = $bdd->prepare('SELECT Id_Uti, Pwd_Uti FROM UTILISATEUR WHERE Mail_Uti = :mail');
@@ -66,3 +61,4 @@ try {
     // Handle any exceptions
     echo "An error occurred: " . $e->getMessage();
 }
+?>
