@@ -1,4 +1,5 @@
 <?php
+use DBConfig\Database;
 // Vérifier si le formulaire a été soumis
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Vérifier si le fichier a été correctement téléchargé
@@ -6,13 +7,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Spécifier le chemin du dossier de destination
         $targetDir = __DIR__ . "/img_producteur/";
         // Obtenir le nom du fichier téléchargé
-        $utilisateur = "inf2pj02";
-        $serveur = "localhost";
-        $motdepasse = "ahV4saerae";
-        $basededonnees = "inf2pj_02";
+
+
+        // Database connection function
+        function dbConnect(): PDO {
+            return Database::getConnection();
+        }
         session_start();
         // Connect to database
-        $bdd = new PDO('mysql:host=' . $serveur . ';dbname=' . $basededonnees, $utilisateur, $motdepasse);
+        $bdd = dbConnect():
 
         if (isset($_SESSION["Mail_Uti"])) {
             $mailUti = $_SESSION["Mail_Uti"];

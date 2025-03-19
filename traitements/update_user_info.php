@@ -1,13 +1,15 @@
-
 <?php
+
+use DBConfig\Database;
 if (isset($_POST['new_nom'], $_POST['new_prenom'], $_POST['rue'], $_POST['code'], $_POST['ville'], $_POST['pwd'])) {
     $adr = $_POST['rue'] .", ". $_POST['code']. " ".mb_strtoupper($_POST['ville']);
 
-    $utilisateur = "inf2pj02";
-    $serveur = "localhost";
-    $motdepasse = "ahV4saerae";
-    $basededonnees = "inf2pj_02";
-    $bdd = new PDO('mysql:host='.$serveur.';dbname='.$basededonnees,$utilisateur,$motdepasse);
+
+    // Database connection function
+    function dbConnect(): PDO {
+        return Database::getConnection();
+    }
+    $bdd = dbConnect();
 
     if(!isset($_SESSION)){
         session_start();

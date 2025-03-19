@@ -1,5 +1,6 @@
 <?php
     require "language.php" ; 
+    use DBConfig\Database;
 ?>
 <?php
 $pwd1 = $_POST['pwd1'];
@@ -7,11 +8,13 @@ $pwd2 = $_POST['pwd2'];
 
 if ($pwd1 == $pwd2 && $pwd1 !== null) {
 
-    $utilisateur = "inf2pj02";
-    $serveur = "localhost";
-    $motdepasse = "ahV4saerae";
-    $basededonnees = "inf2pj_02";
-    $bdd = new PDO('mysql:host=' . $serveur . ';dbname=' . $basededonnees, $utilisateur, $motdepasse);
+
+
+    // Database connection function
+    function dbConnect(): PDO {
+        return Database::getConnection();
+    }
+    $bdd = dbConnect();
 
     if(!isset($_SESSION)){
         session_start();

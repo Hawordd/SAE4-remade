@@ -1,12 +1,10 @@
 <?php
-    function dbConnect(){
-        $utilisateur = "inf2pj02";
-        $serveur = "localhost";
-        $motdepasse = "ahV4saerae";
-        $basededonnees = "inf2pj_02";
-        // Connect to database
-        return new PDO('mysql:host=' . $serveur . ';dbname=' . $basededonnees, $utilisateur, $motdepasse);
-    }
+      use DBConfig\Database;
+
+      // Database connection function
+      function dbConnect(): PDO {
+          return Database::getConnection();
+      }
     $bdd=dbConnect();
     //var_dump($_POST);
     $Id_Produit = htmlspecialchars($_POST["IdProductAModifier"]);
@@ -36,11 +34,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_FILES["image"])) {
         // Spécifier le chemin du dossier de destination
         $targetDir = __DIR__ . "/img_produit/";
-        // Obtenir le nom du fichier téléchargé
-        $utilisateur = "inf2pj02";
-        $serveur = "localhost";
-        $motdepasse = "ahV4saerae";
-        $basededonnees = "inf2pj_02";
         if(!isset($_SESSION)){
             session_start();
             }

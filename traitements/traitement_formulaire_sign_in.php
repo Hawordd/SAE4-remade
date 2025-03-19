@@ -1,5 +1,6 @@
 <?php
     require "language.php" ; 
+    use DBConfig\Database;
 ?>
 <?php
 
@@ -14,14 +15,14 @@ try {
         $_SESSION['test_pwd'] = 5;
     }
 
-    // Database connection
-    $utilisateur = "inf2pj02";
-    $serveur = "localhost";
-    $motdepasse = "ahV4saerae";
-    $basededonnees = "inf2pj_02";
 
+
+    // Database connection function
+    function dbConnect(): PDO {
+        return Database::getConnection();
+    }
     // Connect to database
-    $bdd = new PDO('mysql:host=' . $serveur . ';dbname=' . $basededonnees, $utilisateur, $motdepasse);
+    $bdd = dbConnect();
 
     // Check if user email exists
     $queryIdUti = $bdd->query('SELECT Id_Uti FROM UTILISATEUR WHERE UTILISATEUR.Mail_Uti=\'' . $Mail_Uti . '\'');

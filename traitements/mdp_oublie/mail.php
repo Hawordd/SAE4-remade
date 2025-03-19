@@ -6,11 +6,13 @@
 $email = $_POST["email"];
 $_SESSION["mailTemp"]=$email;
 
-$utilisateur = "inf2pj02";
-$serveur = "localhost";
-$motdepasse = "ahV4saerae";
-$basededonnees = "inf2pj_02";
-$bdd = new PDO('mysql:host=' . $serveur . ';dbname=' . $basededonnees, $utilisateur, $motdepasse);
+use DBConfig\Database;
+
+// Database connection function
+function dbConnect(): PDO {
+    return Database::getConnection();
+}
+$bdd = dbConnect();
 
 // Vérifiez d'abord si l'adresse e-mail existe déjà dans la table UTILISATEUR
 $checkEmailQuery = "SELECT COUNT(*) AS count FROM UTILISATEUR WHERE Mail_Uti = :mail";

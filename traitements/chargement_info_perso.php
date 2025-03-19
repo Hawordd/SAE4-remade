@@ -1,9 +1,11 @@
 <?php
-$utilisateur = "inf2pj02";
-$serveur = "localhost";
-$motdepasse = "ahV4saerae";
-$basededonnees = "inf2pj_02";
-$connexion = new mysqli($serveur, $utilisateur, $motdepasse, $basededonnees);
+use DBConfig\Database;
+
+// Database connection function
+function dbConnect(): PDO {
+    return Database::getConnection();
+}
+$connexion = dbConnect();
 
 // Vérifiez la connexion
 if ($connexion->connect_error) {

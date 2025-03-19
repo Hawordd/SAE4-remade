@@ -1,13 +1,11 @@
-
 <?php
 header('Content-Type: text/html; charset=utf-8');
 
-function dbConnect(){
-    $host = 'localhost';
-    $dbname = 'inf2pj_02';
-    $user = 'inf2pj02';
-    $password = 'ahV4saerae';
-    return new PDO('mysql:host='.$host.';dbname='.$dbname,$user,$password);
+use DBConfig\Database;
+
+// Database connection function
+function dbConnect(): PDO {
+    return Database::getConnection();
 }
 
 $bdd = dbConnect();

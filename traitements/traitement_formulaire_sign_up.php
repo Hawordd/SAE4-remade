@@ -14,11 +14,13 @@ $Mail_Uti = $_POST['mail'];
 $_SESSION['Mail_Temp']=$Mail_Uti;
 
 // Connexion à la base de données 
-$utilisateur = "inf2pj02";
-$serveur = "localhost";
-$motdepasse = "ahV4saerae";
-$basededonnees = "inf2pj_02";
-$connexion = new mysqli($serveur, $utilisateur, $motdepasse, $basededonnees);
+use DBConfig\Database;
+
+// Database connection function
+function dbConnect(): PDO {
+    return Database::getConnection();
+}
+$connexion = dbConnect();
 
 // Récupération de la valeur maximum de Id_Uti
 $requete = "SELECT MAX(Id_Uti) AS id_max FROM UTILISATEUR";

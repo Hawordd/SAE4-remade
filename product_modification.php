@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
-<?php
+    <?php
     require "language.php" ; 
 ?>
     <title><?php echo $htmlMarque; ?></title>
@@ -9,18 +10,17 @@
     <link rel="stylesheet" type="text/css" href="css/style_general.css">
     <link rel="stylesheet" type="text/css" href="css/popup.css">
 </head>
+
 <body>
     <?php
         if(!isset($_SESSION)){
             session_start();
         }
-        function dbConnect(){
-            $utilisateur = "inf2pj02";
-            $serveur = "localhost";
-            $motdepasse = "ahV4saerae";
-            $basededonnees = "inf2pj_02";
-            // Connect to database
-            return new PDO('mysql:host=' . $serveur . ';dbname=' . $basededonnees, $utilisateur, $motdepasse);
+        use DBConfig\Database;
+
+        // Database connection function
+        function dbConnect(): PDO {
+            return Database::getConnection();
         }
           $utilisateur=htmlspecialchars($_SESSION["Id_Uti"]);
           $Id_Produit_Update=htmlspecialchars($_POST["modifyIdProduct"]);
@@ -43,18 +43,19 @@
         ?>
     <div class="container">
         <div class="leftColumn">
-			<img class="logo" href="index.php" src="img/logo.png">
+            <img class="logo" href="index.php" src="img/logo.png">
             <div class="contenuBarre">
-                
-            
-            <center><p><strong><?php echo $htmlAjouterProduit?></strong></p>
-            <form action="modify_product.php" method="post" enctype="multipart/form-data">
 
-                <label for="pwd"><?php echo $htmlProduitDeuxPoints?> </label>
-                <input type="hidden" name="IdProductAModifier" value="<?php echo $Id_Produit_Update ?>">
-                <input type="text" name="nomProduit" value="<?php echo $Nom_Produit?>" required><br><br>
-                <select name="categorie">
-                    <?php 
+
+                <center>
+                    <p><strong><?php echo $htmlAjouterProduit?></strong></p>
+                    <form action="modify_product.php" method="post" enctype="multipart/form-data">
+
+                        <label for="pwd"><?php echo $htmlProduitDeuxPoints?> </label>
+                        <input type="hidden" name="IdProductAModifier" value="<?php echo $Id_Produit_Update ?>">
+                        <input type="text" name="nomProduit" value="<?php echo $Nom_Produit?>" required><br><br>
+                        <select name="categorie">
+                            <?php 
                         switch ($Id_Type_Produit) {
                             case 1:
                                 echo "";
@@ -123,11 +124,12 @@
                         }
                     ?>
 
-			    </select>
-                <br>
-                <br><?php echo $htmlPrix?>
-                <input style="width: 50px;" value="<?php echo $Prix_Produit_Unitaire?>" type="number" min="0" name="prix" required>€
-                <?php
+                        </select>
+                        <br>
+                        <br><?php echo $htmlPrix?>
+                        <input style="width: 50px;" value="<?php echo $Prix_Produit_Unitaire?>" type="number" min="0"
+                            name="prix" required>€
+                        <?php
                     switch ($Id_Unite_Prix) {
                         case 1:
                             echo "<label>";
@@ -147,10 +149,11 @@
                         break;
                     }
                 ?>
-                <br>
-                <br>Stock : 
-                <input type="number" value="<?php echo $Qte_Produit?>" style="width: 50px;" min="0" name="quantite" required>
-                <?php
+                        <br>
+                        <br>Stock :
+                        <input type="number" value="<?php echo $Qte_Produit?>" style="width: 50px;" min="0"
+                            name="quantite" required>
+                        <?php
                     switch ($Id_Unite_Stock) {
                         case 1:
                             echo "<label>";
@@ -210,24 +213,24 @@
                             break;
                     }
                 ?>
-                <br>
-                <br>
-                <input type="file" name="image" accept=".png">
-                <br>
-                <br>
-                <input type="submit" value="<?php echo $htmlConfirmerModifProd?>">
-            </form>
-            <br>
-            <form action="produits.php" method="post">
-                <input type="submit" value="<?php echo $htmlAnnulerModifProd?>">
-            </form>
-            <br>
-            <?php
+                        <br>
+                        <br>
+                        <input type="file" name="image" accept=".png">
+                        <br>
+                        <br>
+                        <input type="submit" value="<?php echo $htmlConfirmerModifProd?>">
+                    </form>
+                    <br>
+                    <form action="produits.php" method="post">
+                        <input type="submit" value="<?php echo $htmlAnnulerModifProd?>">
+                    </form>
+                    <br>
+                    <?php
             //echo '<img class="img-produit" src="/~inf2pj02/img_produit/' . $Id_Produit_Update  . '.png" alt="Image non fournie" style="width: 100%; height: 85%;" ><br>';
             ?>
-            <br>
-            <br>
-            </center>
+                    <br>
+                    <br>
+                </center>
 
 
 
@@ -237,7 +240,7 @@
         <div class="rightColumn">
             <div class="topBanner">
                 <div class="divNavigation">
-                <a class="bontonDeNavigation" href="index.php"><?php echo $htmlAccueil?></a>
+                    <a class="bontonDeNavigation" href="index.php"><?php echo $htmlAccueil?></a>
                     <?php
                         if (isset($_SESSION["Id_Uti"])){
                             echo'<a class="bontonDeNavigation" href="messagerie.php">'.$htmlMessagerie.'</a>';
@@ -263,19 +266,24 @@
                     }
                     ?>
 
-                    <input type="submit" value="<?php if (!isset($_SESSION['Mail_Uti'])){/*$_SESSION = array()*/; echo($htmlSeConnecter);} else {echo ''.$_SESSION['Mail_Uti'].'';}?>" class="boutonDeConnection">
-                    <input type="hidden" name="popup" value=<?php if(isset($_SESSION['Mail_Uti'])){echo '"info_perso"';}else{echo '"sign_in"';}?>>
-                
+                    <input type="submit"
+                        value="<?php if (!isset($_SESSION['Mail_Uti'])){/*$_SESSION = array()*/; echo($htmlSeConnecter);} else {echo ''.$_SESSION['Mail_Uti'].'';}?>"
+                        class="boutonDeConnection">
+                    <input type="hidden" name="popup"
+                        value=<?php if(isset($_SESSION['Mail_Uti'])){echo '"info_perso"';}else{echo '"sign_in"';}?>>
+
                 </form>
             </div>
 
-            
 
 
-                    <!-- partie de gauche avec les produits -->
-                    <p><center><U><?php echo $htmlMesProduitsEnStock?></U></center></p>
-                    <div class="gallery-container">
-                        <?php
+
+            <!-- partie de gauche avec les produits -->
+            <p>
+                <center><U><?php echo $htmlMesProduitsEnStock?></U></center>
+            </p>
+            <div class="gallery-container">
+                <?php
                             $bdd=dbConnect();
                             $queryIdProd = $bdd->prepare('SELECT Id_Prod FROM PRODUCTEUR WHERE Id_Uti = :utilisateur');
                             $queryIdProd->bindParam(':utilisateur', $utilisateur, PDO::PARAM_INT);
@@ -334,7 +342,7 @@
                                 }
                             }
                         ?>
-                    </div>
+            </div>
 
 
 
@@ -344,11 +352,11 @@
                 <form method="post">
                     <input type="submit" value="<?php echo $htmlSignalerDys?>" class="lienPopup">
                     <input type="hidden" name="popup" value="contact_admin">
-				</form>
+                </form>
                 <form method="post">
                     <input type="submit" value="<?php echo $htmlCGU?>" class="lienPopup">
                     <input type="hidden" name="popup" value="cgu">
-				</form>
+                </form>
             </div>
         </div>
     </div>

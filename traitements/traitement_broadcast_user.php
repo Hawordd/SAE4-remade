@@ -3,12 +3,14 @@ if(!isset($_SESSION)){
         session_start();
         }
 // Database connection
-$utilisateur = "inf2pj02";
-$serveur = "localhost";
-$motdepasse = "ahV4saerae";
-$basededonnees = "inf2pj_02";
+use DBConfig\Database;
+
+// Database connection function
+function dbConnect(): PDO {
+    return Database::getConnection();
+}
 // Connect to database
-$bdd = new PDO('mysql:host=' . $serveur . ';dbname=' . $basededonnees, $utilisateur, $motdepasse);
+$bdd = dbConnect();
 $message = $_POST['message'];
 if (isset($_SESSION["Id_Uti"]) && isset($message)) {
   $message = $bdd->quote($message);

@@ -2,16 +2,12 @@
     require "language.php" ; 
 ?>
 <?php
-     function dbConnect(){
-        $utilisateur = "inf2pj02";
-        $serveur = "localhost";
-        $motdepasse = "ahV4saerae";
-        $basededonnees = "inf2pj_02";
-        return new PDO('mysql:host=' . $serveur . ';dbname=' . $basededonnees, $utilisateur, $motdepasse);
-        }
-        if(!isset($_SESSION)){
-            session_start();
-            }
+      use DBConfig\Database;
+
+      // Database connection function
+      function dbConnect(): PDO {
+          return Database::getConnection();
+      }
     $Id_Uti=htmlspecialchars($_SESSION["Id_Uti"]);
 
     $bdd=dbConnect();
@@ -45,11 +41,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_FILES["image"])) {
         // Spécifier le chemin du dossier de destination
         $targetDir = __DIR__ . "/img_produit/";
-        // Obtenir le nom du fichier téléchargé
-        $utilisateur = "inf2pj02";
-        $serveur = "localhost";
-        $motdepasse = "ahV4saerae";
-        $basededonnees = "inf2pj_02";
 
         // Obtenir l'extension du fichie
         $extension = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
