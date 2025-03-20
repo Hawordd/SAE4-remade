@@ -15,7 +15,7 @@ $message = $_POST['message'];
 if (isset($_SESSION["Id_Uti"]) && isset($message)) {
   $message = $bdd->quote($message);
 
-  $bdd->query('CALL broadcast_Utilisateur(' . $_SESSION["Id_Uti"] . ', ' . $message . ');');
+  $bdd->query('CALL broadcast_Utilisateur(' . $_SESSION["Id_Uti"] . ', ' . htmlspecialchars($message) . ');');
   header("Location: ../messagerie.php");
 } else {
   echo "error";
