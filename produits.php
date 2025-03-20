@@ -4,6 +4,9 @@ if(!isset($_SESSION)){
 }
 
 require "language.php";
+
+require_once 'DBConfig/Database.php';
+require_once 'DBConfig/Config.php';
 use DBConfig\Database;
 
 function dbConnect(): PDO {

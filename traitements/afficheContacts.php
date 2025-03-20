@@ -5,6 +5,9 @@
 error_reporting(E_ALL);
 ini_set("display_errors", 1);
 
+require_once 'DBConfig/Database.php';
+require_once 'DBConfig/Config.php';
+
 use DBConfig\Database;
 
 // Database connection function

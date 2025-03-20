@@ -14,6 +14,8 @@
         if(!isset($_SESSION)){
             session_start();
         }
+    require_once 'DBConfig/Database.php';
+    require_once 'DBConfig/Config.php';
         use DBConfig\Database;
 
         function dbConnect(): PDO {
