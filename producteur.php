@@ -1,13 +1,10 @@
 <?php
-// Start session at the very beginning
 if (!isset($_SESSION)) {
     session_start();
 }
 
 spl_autoload_register(function ($class) {
-    // Convert namespace separator to directory separator
     $path = str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
-
     if (file_exists($path)) {
         require_once $path;
         return true;
@@ -15,24 +12,18 @@ spl_autoload_register(function ($class) {
     return false;
 });
 
-// Include language file
 require "language_fr.php";
-
-//Use database classes namespace
 use DBConfig\Database;
 
-// Database connection function
 function dbConnect(): PDO {
     return Database::getConnection();
 }
 
-// Process GET parameters
 $Id_Prod = isset($_GET["Id_Prod"]) ? htmlspecialchars($_GET["Id_Prod"]) : "";
 $filtreType = isset($_GET["filtreType"]) ? htmlspecialchars($_GET["filtreType"]) : "TOUT";
 $tri = isset($_GET["tri"]) ? htmlspecialchars($_GET["tri"]) : "No";
 $rechercheNom = isset($_GET["rechercheNom"]) ? htmlspecialchars($_GET["rechercheNom"]) : "";
 
-// Handle popup session management
 if(isset($_SESSION, $_SESSION['tempPopup'])) {
     $_POST['popup'] = $_SESSION['tempPopup'];
     unset($_SESSION['tempPopup']);
@@ -45,16 +36,13 @@ if(isset($_SESSION, $_SESSION['tempPopup'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?php echo $htmlMarque; ?></title>
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <!-- Custom CSS -->
     <link rel="stylesheet" type="text/css" href="css/style_general.css">
     <link rel="stylesheet" type="text/css" href="css/popup.css">
 </head>
 
 <body class="d-flex" style="background-color: #EBF4EC;">
-    <!-- Sidebar -->
     <div class="d-flex flex-column flex-shrink-0 p-3 position-sticky top-0"
         style="width: 280px; height: 100vh; overflow-y: auto; background-color: #659D31;">
         <span class="fs-4"><a href="index.php"><img class="img-fluid mw-100" src="img/logo.png" alt="Logo"></a></span>
@@ -64,14 +52,12 @@ if(isset($_SESSION, $_SESSION['tempPopup'])) {
             <form action="producteur.php" method="get" class="needs-validation">
                 <input type="hidden" name="Id_Prod" value="<?php echo $Id_Prod; ?>">
 
-                <!-- Recherche par nom -->
                 <div class="mb-3">
                     <label for="rechercheNom" class="form-label"><?php echo $htmlTiretNom; ?></label>
                     <input type="text" class="form-control form-control-sm" id="rechercheNom" name="rechercheNom"
                         value="<?php echo $rechercheNom; ?>" placeholder="<?php echo $htmlNom; ?>">
                 </div>
 
-                <!-- Types de produits -->
                 <div class="mb-3">
                     <p class="form-label"><?php echo "- " .' Type de produit :'; ?></p>
 
@@ -140,7 +126,6 @@ if(isset($_SESSION, $_SESSION['tempPopup'])) {
                     </div>
                 </div>
 
-                <!-- Options de tri -->
                 <div class="mb-4">
                     <label for="tri" class="form-label"><?php echo $htmlTri; ?></label>
                     <select class="form-select form-select-sm" id="tri" name="tri">
@@ -162,9 +147,7 @@ if(isset($_SESSION, $_SESSION['tempPopup'])) {
         </div>
     </div>
 
-    <!-- Main Content Area -->
     <div class="flex-grow-1">
-        <!-- Navbar -->
         <nav class="navbar navbar-expand-xl navbar-dark bg-white">
             <div class="container-fluid">
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain"
@@ -175,7 +158,6 @@ if(isset($_SESSION, $_SESSION['tempPopup'])) {
 
                 <div class="collapse navbar-collapse" id="navbarMain">
                     <ul class="navbar-nav me-auto mb-2 mb-xl-0 d-flex align-items-center">
-                        <!-- Always visible -->
                         <li class="nav-item">
                             <a class="nav-link text-black" href="index.php"><?php echo $htmlAccueil; ?></a>
                         </li>
@@ -211,7 +193,6 @@ if(isset($_SESSION, $_SESSION['tempPopup'])) {
                     </ul>
 
                     <ul class="navbar-nav d-flex align-items-center">
-                        <!-- Language selector form -->
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle text-black" href="#" role="button"
                                 data-bs-toggle="dropdown" aria-expanded="false">
@@ -277,7 +258,6 @@ if(isset($_SESSION, $_SESSION['tempPopup'])) {
         <main class="p-3">
             <div class="container">
                 <?php
-                // Fetch producer info
                 $bdd = dbConnect();
                 $queryInfoProd = $bdd->prepare('
                     SELECT UTILISATEUR.Id_Uti, UTILISATEUR.Adr_Uti, Prenom_Uti, Nom_Uti, Prof_Prod 
@@ -289,13 +269,11 @@ if(isset($_SESSION, $_SESSION['tempPopup'])) {
                 $queryInfoProd->execute();   
                 $returnQueryInfoProd = $queryInfoProd->fetchAll(PDO::FETCH_ASSOC);
 
-                // Check if producer exists
                 if(count($returnQueryInfoProd) == 0) {
                     echo '<div class="alert alert-danger" role="alert">Ce producteur n\'existe pas.</div>';
                     exit;
                 }
 
-                // Get producer details
                 $idUti = $returnQueryInfoProd[0]["Id_Uti"];
                 $address = $returnQueryInfoProd[0]["Adr_Uti"];
                 $nom = $returnQueryInfoProd[0]["Nom_Uti"];
@@ -304,7 +282,6 @@ if(isset($_SESSION, $_SESSION['tempPopup'])) {
                 ?>
 
                 <div class="row my-4" style="width: 100dvh;">
-                    <!-- Producer Info Card -->
                     <div class="col-md-4">
                         <div class="card mb-4">
                             <div class="card-header bg-success text-white">
@@ -323,7 +300,6 @@ if(isset($_SESSION, $_SESSION['tempPopup'])) {
                                 </a>
                                 <?php endif; ?>
 
-                                <!-- Map -->
                                 <?php if (isset($address)): 
                                     $addressForMap = str_replace(" ", "+", $address);
                                 ?>
@@ -337,7 +313,6 @@ if(isset($_SESSION, $_SESSION['tempPopup'])) {
                         </div>
                     </div>
 
-                    <!-- Products -->
                     <div class="col-md-8">
                         <div class="card">
                             <div class="card-header bg-success text-white">
@@ -345,7 +320,6 @@ if(isset($_SESSION, $_SESSION['tempPopup'])) {
                             </div>
                             <div class="card-body">
                                 <?php
-                                // Query to get products based on filters
                                 $query = 'SELECT Id_Produit, Id_Prod, Nom_Produit, Desc_Type_Produit, Prix_Produit_Unitaire, Nom_Unite_Prix, Qte_Produit 
                                           FROM Produits_d_un_producteur 
                                           WHERE Id_Prod = :Id_Prod';
@@ -358,7 +332,6 @@ if(isset($_SESSION, $_SESSION['tempPopup'])) {
                                     $query .= ' AND Nom_Produit LIKE :rechercheNom';
                                 }
                                 
-                                // Add sorting
                                 switch ($tri) {
                                     case "PrixAsc":
                                         $query .= ' ORDER BY Prix_Produit_Unitaire ASC';
@@ -394,7 +367,6 @@ if(isset($_SESSION, $_SESSION['tempPopup'])) {
                                 } else {
                                 ?>
 
-                                <!-- Order Form -->
                                 <form method="get" action="insert_commande.php">
                                     <input type="hidden" name="Id_Prod" value="<?php echo $Id_Prod; ?>">
 
@@ -462,7 +434,6 @@ if(isset($_SESSION, $_SESSION['tempPopup'])) {
                 </div>
             </div>
 
-            <!-- Footer links -->
             <footer class="container-fluid mt-5 py-3 bg-light">
                 <div class="row justify-content-center">
                     <div class="col-auto mx-3">
@@ -484,10 +455,7 @@ if(isset($_SESSION, $_SESSION['tempPopup'])) {
         </main>
     </div>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Scripts -->
     <script>
     function setLanguage(lang) {
         document.getElementById('languageValue').value = lang;
