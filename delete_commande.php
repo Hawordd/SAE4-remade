@@ -1,39 +1,42 @@
 <?php
-      use DBConfig\Database;
+use DBConfig\Database;
 
-      // Database connection function
-      function dbConnect(): PDO {
-          return Database::getConnection();
-      }
-      $bdd=dbConnect();
-      $Id_Commande=htmlspecialchars($_POST["deleteValeur"]);
+function dbConnect(): PDO {
+    return Database::getConnection();
+}
 
-      $queryGetProduitCommande = $bdd->prepare(('SELECT Id_Produit, Qte_Produit_Commande FROM produits_commandes  WHERE Id_Commande =:Id_Commande;'));
-      $queryGetProduitCommande->bindParam(":Id_Commande", $Id_Commande, PDO::PARAM_STR);
-      $queryGetProduitCommande->execute();
-      $returnQueryGetProduitCommande = $queryGetProduitCommande->fetchAll(PDO::FETCH_ASSOC);
-      $iterateurProduit=0;
-      $nbProduit=count($returnQueryGetProduitCommande);
-      while ($iterateurProduit<$nbProduit){
-        $Id_Produit=$returnQueryGetProduitCommande[$iterateurProduit]["Id_Produit"];
-        $Qte_Produit_Commande=$returnQueryGetProduitCommande[$iterateurProduit]["Qte_Produit_Commande"];
-        
+try {
+    $bdd = dbConnect();
+    
+    $Id_Commande = filter_input(INPUT_POST, 'deleteValeur', FILTER_SANITIZE_STRING);
+    
+    if (!$Id_Commande) {
+        throw new Exception("Invalid order ID");
+    }
+    
+    $queryGetProduitCommande = $bdd->prepare('SELECT Id_Produit, Qte_Produit_Commande FROM produits_commandes WHERE Id_Commande = :Id_Commande');
+    $queryGetProduitCommande->bindParam(":Id_Commande", $Id_Commande, PDO::PARAM_STR);
+    $queryGetProduitCommande->execute();
+    $products = $queryGetProduitCommande->fetchAll(PDO::FETCH_ASSOC);
+    
+    foreach ($products as $product) {
         $updateProduit = "UPDATE PRODUIT SET Qte_Produit = Qte_Produit + :Qte_Produit_Commande WHERE Id_Produit = :Id_Produit";
         $bindUpdateProduit = $bdd->prepare($updateProduit);
-        $bindUpdateProduit->bindParam(':Qte_Produit_Commande', $Qte_Produit_Commande, PDO::PARAM_INT);
-        $bindUpdateProduit->bindParam(':Id_Produit', $Id_Produit, PDO::PARAM_INT);
+        $bindUpdateProduit->bindParam(':Qte_Produit_Commande', $product['Qte_Produit_Commande'], PDO::PARAM_INT);
+        $bindUpdateProduit->bindParam(':Id_Produit', $product['Id_Produit'], PDO::PARAM_INT);
         $bindUpdateProduit->execute();
-
-        $iterateurProduit++;
-      }
-      $updateStatutCommande="UPDATE COMMANDE SET Id_Statut = 3 WHERE Id_Commande = :Id_Commande ;";
-      $bindUpdateStatutCommande = $bdd->prepare($updateStatutCommande);
-      $bindUpdateStatutCommande->bindParam(':Id_Commande', $Id_Commande, PDO::PARAM_INT);
-      $bindUpdateStatutCommande->execute();
-
-      //$bdd->query(('DELETE FROM CONTENU WHERE Id_Commande='.$Id_Commande.';'));
-      //$bdd->query(('DELETE FROM COMMANDE WHERE Id_Commande='.$Id_Commande.';'));
-      //echo 'DELETE FROM COMMANDE WHERE Id_Commande='.$Id_Commande.';';
+    }
     
-    header('Location: achats.php?');
+    $updateStatutCommande = "UPDATE COMMANDE SET Id_Statut = 3 WHERE Id_Commande = :Id_Commande";
+    $bindUpdateStatutCommande = $bdd->prepare($updateStatutCommande);
+    $bindUpdateStatutCommande->bindParam(':Id_Commande', $Id_Commande, PDO::PARAM_INT);
+    $bindUpdateStatutCommande->execute();
+    
+    header('Location: achats.php');
+    exit;
+    
+} catch (Exception $e) {
+    header('Location: achats.php?error=1');
+    exit;
+}
 ?>

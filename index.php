@@ -1,11 +1,9 @@
 <?php
-// Start session at the very beginning
 if (!isset($_SESSION)) {
     session_start();
 }
 
 spl_autoload_register(function ($class) {
-    // Convert namespace separator to directory separator
     $path = str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
 
     if (file_exists($path)) {
@@ -15,19 +13,15 @@ spl_autoload_register(function ($class) {
     return false;
 });
 
-// Include language file
 require "language.php";
 
-//Use database classes namespace
 use DBConfig\Database;
 
-// Database connection function
 function dbConnect(): PDO
 {
     return Database::getConnection();
 }
 
-// Process GET parameters
 $rechercheVille = isset($_GET["rechercheVille"]) ? htmlspecialchars($_GET["rechercheVille"]) : "";
 $_GET["categorie"] = isset($_GET["categorie"]) ? $_GET["categorie"] : "Tout";
 $utilisateur = isset($_SESSION["Id_Uti"]) ? htmlspecialchars($_SESSION["Id_Uti"]) : -1;
@@ -35,7 +29,6 @@ $rayon = isset($_GET["rayon"]) ? htmlspecialchars($_GET["rayon"]) : 100;
 $tri = isset($_GET["tri"]) ? htmlspecialchars($_GET["tri"]) : "nombreDeProduits";
 $_SESSION["language"] = isset($_SESSION["language"]) ? $_SESSION["language"] : "fr";
 
-// Define language variables
 $htmlFrançais = "Français";
 $htmlAnglais = "English";
 $htmlEspagnol = "Español";
@@ -43,7 +36,6 @@ $htmlAllemand = "Deutch";
 $htmlRusse = "русский";
 $htmlChinois = "中國人";
 
-// Function to get GPS coordinates
 function latLongGps($url) {
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_PROXY, 'proxy.univ-lemans.fr');
@@ -73,7 +65,6 @@ function latLongGps($url) {
     curl_close($ch);
 }
 
-// Distance calculation function
 function distance($lat1, $lng1, $lat2, $lng2, $miles = false) {
     $pi80 = M_PI / 180;
     $lat1 *= $pi80;
@@ -81,7 +72,7 @@ function distance($lat1, $lng1, $lat2, $lng2, $miles = false) {
     $lat2 *= $pi80;
     $lng2 *= $pi80;
 
-    $r = 6372.797; // mean radius of Earth in km
+    $r = 6372.797;
     $dlat = $lat2 - $lat1;
     $dlng = $lng2 - $lng1;
     $a = sin($dlat / 2) * sin($dlat / 2) + cos($lat1) * cos($lat2) * sin($dlng / 2) * sin($dlng / 2);
@@ -91,7 +82,6 @@ function distance($lat1, $lng1, $lat2, $lng2, $miles = false) {
     return ($miles ? ($km * 0.621371192) : $km);
 }
 
-// Get user address
 $mabdd = dbConnect();           
 $queryAdrUti = $mabdd->prepare('SELECT Adr_Uti FROM UTILISATEUR WHERE Id_Uti = :utilisateur');
 $queryAdrUti->bindParam(":utilisateur", $utilisateur, PDO::PARAM_STR);
@@ -104,7 +94,6 @@ if (count($returnQueryAdrUti) > 0) {
     $Adr_Uti_En_Cours = 'France';
 }
 
-// Handle popup session management
 if (isset($_SESSION['tempPopup'])) {
     $_POST['popup'] = $_SESSION['tempPopup'];
     unset($_SESSION['tempPopup']);
@@ -117,10 +106,8 @@ if (isset($_SESSION['tempPopup'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?php echo $htmlMarque; ?></title>
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <!-- Custom CSS -->
     <link rel="stylesheet" type="text/css" href="css/style_general.css">
     <link rel="stylesheet" type="text/css" href="css/popup.css">
 </head>
@@ -134,7 +121,6 @@ if (isset($_SESSION['tempPopup'])) {
         <div class="sidebar-content text-white">
             <h5 class="text-center mb-3"><?php echo $htmlRechercherPar; ?></h5>
             <form method="get" action="index.php" class="needs-validation">
-                <!-- Profession -->
                 <div class="mb-3">
                     <label for="categories" class="form-label"><?php echo $htmlParProfession; ?></label>
                     <select class="form-select form-select-sm" name="categorie" id="categories">
@@ -163,16 +149,12 @@ if (isset($_SESSION['tempPopup'])) {
                             <?php echo $htmlPépiniériste; ?></option>
                     </select>
                 </div>
-
-                <!-- Ville -->
                 <div class="mb-3">
                     <label for="ville" class="form-label"><?php echo $htmlParVille; ?></label>
                     <input type="text" class="form-control form-control-sm" id="ville" name="rechercheVille"
                         pattern="[A-Za-z0-9 ]{0,100}" value="<?php echo $rechercheVille; ?>"
                         placeholder="<?php echo $htmlVille; ?>">
                 </div>
-
-                <!-- Rayon -->
                 <?php if (count($returnQueryAdrUti) > 0): ?>
                 <div class="mb-3">
                     <label class="form-label d-flex justify-content-between align-items-center">
@@ -191,8 +173,6 @@ if (isset($_SESSION['tempPopup'])) {
                     </div>
                 </div>
                 <?php endif; ?>
-
-                <!-- Tri -->
                 <div class="mb-4">
                     <label for="tri" class="form-label"><?php echo $htmlTri; ?></label>
                     <select class="form-select form-select-sm" name="tri" required>
@@ -231,7 +211,6 @@ if (isset($_SESSION['tempPopup'])) {
 
                 <div class="collapse navbar-collapse" id="navbarMain">
                     <ul class="navbar-nav me-auto mb-2 mb-xl-0 d-flex align-items-center">
-                        <!-- Always visible -->
                         <li class="nav-item">
                             <a class="nav-link text-black" href="index.php"><?php echo $htmlAccueil; ?></a>
                         </li>
@@ -333,16 +312,10 @@ if (isset($_SESSION['tempPopup'])) {
         <main class="p-3">
             <div class="container">
                 <h1 class="my-3 text-center"><?php echo $htmlProducteursEnMaj; ?></h1>
-
-
-                <!-- Producer gallery using Bootstrap cards -->
                 <div class="row">
                     <?php 
                     if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET["categorie"])) {
-                        // Use the connection from dbConnect
                         $mabdd = dbConnect();
-                        
-                        // Build the query based on filters
                         if ($_GET["categorie"] == "Tout") {
                             $requete = 'SELECT UTILISATEUR.Id_Uti, PRODUCTEUR.Prof_Prod, PRODUCTEUR.Id_Prod, 
                                         UTILISATEUR.Prenom_Uti, UTILISATEUR.Nom_Uti, UTILISATEUR.Adr_Uti, COUNT(PRODUIT.Id_Produit) 
@@ -362,13 +335,9 @@ if (isset($_SESSION['tempPopup'])) {
                                         UTILISATEUR.Prenom_Uti, UTILISATEUR.Nom_Uti, UTILISATEUR.Adr_Uti
                                     HAVING PRODUCTEUR.Prof_Prod = :categorie';
                         }
-                        
-                        // Add city filter if present
                         if ($rechercheVille != "") {
                             $requete .= ' AND Adr_Uti LIKE :rechercheVille';
                         }
-                        
-                        // Add sorting
                         switch ($tri) {
                             case "ordreNomAlphabétique":
                                 $requete .= ' ORDER BY Nom_Uti ASC';
@@ -385,24 +354,16 @@ if (isset($_SESSION['tempPopup'])) {
                             default:
                                 $requete .= ' ORDER BY COUNT(PRODUIT.Id_Produit) DESC';
                         }
-                        
-                        // Prepare and execute the query
                         $stmt = $mabdd->prepare($requete);
-                        
-                        // Bind parameters
                         if ($_GET["categorie"] != "Tout") {
                             $stmt->bindParam(':categorie', $_GET["categorie"]);
                         }
-                        
                         if ($rechercheVille != "") {
                             $villePattern = '%, _____ %' . $rechercheVille . '%';
                             $stmt->bindParam(':rechercheVille', $villePattern);
                         }
-                        
                         $stmt->execute();
                         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                        
-                        // Get user coordinates for distance calculation
                         $urlUti = 'https://nominatim.openstreetmap.org/search?format=json&q=' . urlencode($Adr_Uti_En_Cours);
                         $coordonneesUti = latLongGps($urlUti);
                         $latitudeUti = $coordonneesUti[0];
@@ -411,7 +372,6 @@ if (isset($_SESSION['tempPopup'])) {
                         if (count($result) > 0) {
                             foreach ($result as $row) {
                                 if ($rayon >= 100) {
-                                    // Display all results if radius is max
                                     echo '<div class="col-md-4 mb-4">';
                                     echo '<a href="producteur.php?Id_Prod=' . $row["Id_Prod"] . '" class="text-decoration-none">';
                                     echo '<div class="card shadow-sm h-100">';
@@ -427,13 +387,11 @@ if (isset($_SESSION['tempPopup'])) {
                                     echo '</a>';
                                     echo '</div>';
                                 } else {
-                                    // Filter by distance
                                     $urlProd = 'https://nominatim.openstreetmap.org/search?format=json&q=' . urlencode($row["Adr_Uti"]);
                                     $coordonneesProd = latLongGps($urlProd);
                                     $latitudeProd = $coordonneesProd[0];
                                     $longitudeProd = $coordonneesProd[1];
                                     $distance = distance($latitudeUti, $longitudeUti, $latitudeProd, $longitudeProd);
-                                    
                                     if ($distance < $rayon) {
                                         echo '<div class="col-md-4 mb-4">';
                                         echo '<a href="producteur.php?Id_Prod=' . $row["Id_Prod"] . '" class="text-decoration-none">';

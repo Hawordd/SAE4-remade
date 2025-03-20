@@ -1,64 +1,66 @@
 <?php
-      use DBConfig\Database;
+use DBConfig\Database;
 
-      // Database connection function
-      function dbConnect(): PDO {
-          return Database::getConnection();
-      }
-      $bdd=dbConnect();
-      var_dump($_POST);
+function dbConnect(): PDO {
+    return Database::getConnection();
+}
 
-      $Id_Statut=htmlspecialchars($_POST["categorie"]);
-      $Id_Commande=htmlspecialchars($_POST["idCommande"]);
+try {
+    $bdd = dbConnect();
+    
 
-      if ($Id_Statut==NULL){
-        //rien ne se passe
-        header('Location: delivery.php?');
-      }
-      else if ($Id_Statut==3){
-        // annulation donc on rend les produits et le producteur ne voit plus la commande
-        $updateCommande = "UPDATE COMMANDE SET Id_Statut = :Id_Statut WHERE Id_Commande = :Id_Commande";
-        $bindUpdateCommande = $bdd->prepare($updateCommande);
-        $bindUpdateCommande->bindParam(':Id_Statut', $Id_Statut, PDO::PARAM_INT); 
-        $bindUpdateCommande->bindParam(':Id_Commande', $Id_Commande, PDO::PARAM_INT);
-        $bindUpdateCommande->execute();
+    if (!isset($_POST['categorie']) || !isset($_POST['idCommande'])) {
+        throw new Exception("Missing required parameters");
+    }
+    
+    $Id_Statut = filter_input(INPUT_POST, 'categorie', FILTER_VALIDATE_INT);
+    $Id_Commande = filter_input(INPUT_POST, 'idCommande', FILTER_VALIDATE_INT);
+    
+    if ($Id_Statut === false || $Id_Commande === false) {
+        throw new Exception("Invalid input parameters");
+    }
+    
+    if ($Id_Statut === null) {
 
-        $queryGetProduitCommande = $bdd->prepare(('SELECT Id_Produit, Qte_Produit_Commande FROM produits_commandes  WHERE Id_Commande = :Id_Commande;'));
+        header('Location: delivery.php');
+        exit;
+    }
+    
+
+    $updateCommande = "UPDATE COMMANDE SET Id_Statut = :Id_Statut WHERE Id_Commande = :Id_Commande";
+    $bindUpdateCommande = $bdd->prepare($updateCommande);
+    $bindUpdateCommande->bindParam(':Id_Statut', $Id_Statut, PDO::PARAM_INT); 
+    $bindUpdateCommande->bindParam(':Id_Commande', $Id_Commande, PDO::PARAM_INT);
+    $bindUpdateCommande->execute();
+    
+
+    if ($Id_Statut == 3) {
+
+        $queryGetProduitCommande = $bdd->prepare('SELECT Id_Produit, Qte_Produit_Commande 
+                                                FROM produits_commandes 
+                                                WHERE Id_Commande = :Id_Commande');
         $queryGetProduitCommande->bindParam(":Id_Commande", $Id_Commande, PDO::PARAM_INT);
         $queryGetProduitCommande->execute();
-        $returnQueryGetProduitCommande = $queryGetProduitCommande->fetchAll(PDO::FETCH_ASSOC);
-        $iterateurProduit=0;
-        $nbProduit=count($returnQueryGetProduitCommande);
-        while ($iterateurProduit<$nbProduit){
-          $Id_Produit=$returnQueryGetProduitCommande[$iterateurProduit]["Id_Produit"];
-          $Qte_Produit_Commande=$returnQueryGetProduitCommande[$iterateurProduit]["Qte_Produit_Commande"];
-          $updateProduit="UPDATE PRODUIT SET Qte_Produit = Qte_Produit+".$Qte_Produit_Commande." WHERE Id_Produit = ".$Id_Produit .";";
-          $bdd->exec($updateProduit);
+        $products = $queryGetProduitCommande->fetchAll(PDO::FETCH_ASSOC);
+        
 
-
-          $updateProduit="UPDATE PRODUIT SET Qte_Produit = Qte_Produit+ :Qte_Produit_Commande WHERE Id_Produit = :Id_Produit ;";
-          $bindUpdateProduit = $bdd->prepare($updateProduit);
-          $bindUpdateProduit->bindParam(':Qte_Produit_Commande', $Qte_Produit_Commande, PDO::PARAM_INT); 
-          $bindUpdateProduit->bindParam(':Id_Produit', $Id_Produit, PDO::PARAM_INT);
-          $bindUpdateProduit->execute();
-          $iterateurProduit++;
+        foreach ($products as $product) {
+            $updateProduit = "UPDATE PRODUIT 
+                            SET Qte_Produit = Qte_Produit + :Qte_Produit_Commande 
+                            WHERE Id_Produit = :Id_Produit";
+            $bindUpdateProduit = $bdd->prepare($updateProduit);
+            $bindUpdateProduit->bindParam(':Qte_Produit_Commande', $product['Qte_Produit_Commande'], PDO::PARAM_INT); 
+            $bindUpdateProduit->bindParam(':Id_Produit', $product['Id_Produit'], PDO::PARAM_INT);
+            $bindUpdateProduit->execute();
         }
-        //$bdd->query(('DELETE FROM CONTENU WHERE Id_Commande='.$Id_Commande.';'));
-        //$bdd->query(('DELETE FROM COMMANDE WHERE Id_Commande='.$Id_Commande.';'));
-      }
-      else{
-        //reste, on insert
-        $updateCommande="UPDATE COMMANDE SET Id_Statut = :Id_Statut WHERE Id_Commande = :Id_Commande";
-        $bindUpdateCommande = $bdd->prepare($updateCommande);
-        $bindUpdateCommande->bindParam(':Id_Statut', $Id_Statut, PDO::PARAM_INT); 
-        $bindUpdateCommande->bindParam(':Id_Commande', $Id_Commande, PDO::PARAM_INT);
-        $bindUpdateCommande->execute();
-        /*echo '<br>';
-        echo $updateCommande;
-        echo '<br>';
-        echo $Id_Statut;
-        echo '<br>';
-        echo $Id_Commande;*/
-      }
-    header('Location: delivery.php?');
+    }
+    
+    // Redirect back to delivery page
+    header('Location: delivery.php');
+    exit;
+    
+} catch (Exception $e) {
+    header('Location: delivery.php?error=1');
+    exit;
+}
 ?>
