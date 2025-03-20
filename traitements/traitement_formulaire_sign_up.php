@@ -1,6 +1,8 @@
 <?php
 require "language.php";
 
+use DBConfig\Database;
+
 // Retrieve form data
 $_SESSION['test_pwd'] = 5;
 $nom = $_POST['nom'];
@@ -11,15 +13,9 @@ $Mail_Uti = $_POST['mail'];
 
 $_SESSION['Mail_Temp'] = $Mail_Uti;
 
-// Database connection
-$utilisateur = "inf2pj02";
-$serveur = "localhost";
-$motdepasse = "ahV4saerae";
-$basededonnees = "inf2pj_02";
-
 try {
     // Connect to the database with PDO
-    $connexion = new PDO("mysql:host=$serveur;dbname=$basededonnees", $utilisateur, $motdepasse);
+    $connexion = Database::getConnection();
     $connexion->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // Retrieve the maximum Id_Uti value
