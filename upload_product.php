@@ -1,39 +1,34 @@
 <?php
-    require "language.php" ; 
-?>
-<?php
-// Vérifier si le formulaire a été soumis
+if(!isset($_SESSION)) {
+    session_start();
+}
+
+require "language.php";
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Vérifier si le fichier a été correctement téléchargé
-    if (isset($_FILES["image"])) {
-        // Spécifier le chemin du dossier de destination
+    if (isset($_FILES["image"]) && isset($_SESSION["Id_Produit"])) {
         $targetDir = __DIR__ . "/img_produit/";
-        // Obtenir le nom du fichier téléchargé
-        session_start();
-
-
-        // Obtenir l'extension du fichie
         $extension = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
-
-        // Utiliser l'extension dans le nouveau nom du fichier
         $newFileName = htmlspecialchars($_SESSION["Id_Produit"]) . '.' . $extension;
-
-        // Créer le chemin complet du fichier de destination
         $targetPath = $targetDir . $newFileName;
         
-        unlink( $targetPath ); 
-        // Déplacer le fichier téléchargé vers le dossier de destination
+        if (file_exists($targetPath)) {
+            unlink($targetPath);
+        }
+        
         if (move_uploaded_file($_FILES["image"]["tmp_name"], $targetPath)) {
-            echo "<br><?php echo $htmlImgTelecSucces?> $newFileName<br>";
+            header('Location: produits.php');
+            exit;
+        } else {
+            $errorMessage = error_get_last()['message'] ?? 'Unknown error';
+            header('Location: mes_produits.php?erreur=' . urlencode($errorMessage));
+            exit;
+        }
+    } else {
+        header('Location: produits.php');
+        exit;
+    }
 } else {
-echo "$htmlImgTelecRate " . error_get_last()['message'] . "<br>";
-header('Location: mes_produits.php?erreur='. error_get_last()['message'] );
+    header('Location: produits.php');
+    exit;
 }
-
-} else {
-echo $htmlSelecImg."<br>";
-}
-
-header('Location: produits.php');
-}
-?>

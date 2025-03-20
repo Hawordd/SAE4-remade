@@ -1,59 +1,51 @@
 <?php
+if(!isset($_SESSION)) {
+    session_start();
+}
+
 use DBConfig\Database;
-// Vérifier si le formulaire a été soumis
+
+function dbConnect(): PDO {
+    return Database::getConnection();
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Vérifier si le fichier a été correctement téléchargé
     if (isset($_FILES["image"])) {
-        // Spécifier le chemin du dossier de destination
         $targetDir = __DIR__ . "/img_producteur/";
-        // Obtenir le nom du fichier téléchargé
-
-
-        // Database connection function
-        function dbConnect(): PDO {
-            return Database::getConnection();
-        }
-        session_start();
-        // Connect to database
-        $bdd = dbConnect():
+        
+        $bdd = dbConnect();
 
         if (isset($_SESSION["Mail_Uti"])) {
             $mailUti = $_SESSION["Mail_Uti"];
         } else {
             $mailUti = $_SESSION["Mail_Temp"];
         }
+        
         $requete = 'SELECT PRODUCTEUR.Id_Prod FROM PRODUCTEUR JOIN UTILISATEUR ON PRODUCTEUR.Id_Uti = UTILISATEUR.Id_Uti WHERE UTILISATEUR.Mail_Uti = :mail';
         $queryIdProd = $bdd->prepare($requete);
         $queryIdProd->bindParam(':mail', $mailUti, PDO::PARAM_STR);
         $queryIdProd->execute();
         $returnqueryIdProd = $queryIdProd->fetchAll(PDO::FETCH_ASSOC);
-        $Id_Prod=$returnqueryIdProd[0]["Id_Prod"];
+        $Id_Prod = $returnqueryIdProd[0]["Id_Prod"];
 
-        // Obtenir l'extension du fichie
         $extension = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
-
-        // Utiliser l'extension dans le nouveau nom du fichier
         $newFileName = $Id_Prod . '.' . $extension;
-
-        // Créer le chemin complet du fichier de destination
         $targetPath = $targetDir . $newFileName;
         
-        unlink( $targetPath ); 
-        // Déplacer le fichier téléchargé vers le dossier de destination
-        if (move_uploaded_file($_FILES["image"]["tmp_name"], $targetPath)) {
-            echo "<br>L'image a été téléchargée avec succès. Nouveau nom du fichier : $newFileName<br>";
-            
-        header('Location: ./index.php');  
-        } else {
-            echo "Le déplacement du fichier a échoué. Erreur : " . error_get_last()['message'] . "<br>";
+        if (file_exists($targetPath)) {
+            unlink($targetPath);
         }
-
+        
+        if (move_uploaded_file($_FILES["image"]["tmp_name"], $targetPath)) {
+            header('Location: ./index.php');
+            exit;
+        } else {
+            $errorMessage = error_get_last()['message'] ?? 'Unknown error';
+            header('Location: ./index.php?error=' . urlencode($errorMessage));
+            exit;
+        }
     } else {
-        echo "Veuillez sélectionner une image.<br>";
+        header('Location: ./index.php?error=no_image_selected');
+        exit;
     }
-    
-      
-
 }
-
-?>
