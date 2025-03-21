@@ -16,7 +16,7 @@ $_SESSION['Mail_Temp'] = $Mail_Uti;
 try {
     // Connect to the database with PDO
     $connexion = Database::getConnection();
-    $connexion->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    //$connexion->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // Retrieve the maximum Id_Uti value
     $requete = $connexion->query("SELECT MAX(Id_Uti) AS id_max FROM UTILISATEUR");

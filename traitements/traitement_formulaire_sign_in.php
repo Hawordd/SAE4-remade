@@ -1,7 +1,8 @@
 <?php
 require "language.php";
-require_once __DIR__ . "/../DBConfig/Database.php";
-require_once __DIR__ . "/../DBConfig/Config.php";
+use DBConfig\Database;
+//require_once __DIR__ . "/../DBConfig/Database.php";
+//require_once __DIR__ . "/../DBConfig/Config.php";
 
 // Set up logging
 $logFile = __DIR__ . '/../logs/auth.log';
@@ -33,7 +34,7 @@ try {
     }
 
     // Use Database class instead of hardcoding credentials
-    $bdd = \DBConfig\Database::getConnection();
+    $bdd = Database::getConnection();
 
     // Check if user email exists
     $queryIdUti = $bdd->prepare('SELECT Id_Uti, Pwd_Uti FROM UTILISATEUR WHERE Mail_Uti = :mail');
